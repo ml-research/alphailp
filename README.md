@@ -2,7 +2,7 @@
 This is the implementation of the paper: 
 ### alphaILP: Thinking Visual Scenes as Differentiable Logic Programs
 to appear in [Machine Learning](https://www.springer.com/journal/10994), and presented at [IJCLR 2022](https://ijclr22.doc.ic.ac.uk/)
-#### [Hikaru Shindo](https://www.hikarushindo.com/), [Viktor Pfanschilling](https://ml-research.github.io/people/vpfanschilling/) [Devendra Singh Dhami](https://sites.google.com/view/devendradhami), and [Kristian Kersting](https://ml-research.github.io/people/kkersting/index.html).
+#### [Hikaru Shindo](https://www.hikarushindo.com/), [Viktor Pfanschilling](https://ml-research.github.io/people/vpfanschilling/), [Devendra Singh Dhami](https://sites.google.com/view/devendradhami), and [Kristian Kersting](https://ml-research.github.io/people/kkersting/index.html).
 
 ![ailp](./imgs/aILP.png)
 
