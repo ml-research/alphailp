@@ -1,0 +1,1 @@
+kp(X):-in(O1,X),in(O2,X),in(O3,X),in(O4,X).
