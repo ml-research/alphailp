@@ -88,7 +88,8 @@ class NSFReasoner(nn.Module):
         C = self.clauses
         Ws_softmaxed = torch.softmax(self.im.W, 1)
 
-        print("Ws_softmaxed: ", np.round(Ws_softmaxed.detach().cpu().numpy(), 2))
+        print("Ws_softmaxed: ", np.round(
+            Ws_softmaxed.detach().cpu().numpy(), 2))
 
         for i, W_ in enumerate(Ws_softmaxed):
             max_i = np.argmax(W_.detach().cpu().numpy())
@@ -96,7 +97,7 @@ class NSFReasoner(nn.Module):
                   C[max_i], np.round(np.array(W_[max_i].detach().cpu().item()), 2))
 
     def print_valuation_batch(self, valuation, n=40):
-        #self.print_program()
+        # self.print_program()
         for b in range(valuation.size(0)):
             print('===== BATCH: ', b, '=====')
             v = valuation[b].detach().cpu().numpy()

@@ -19,6 +19,7 @@ def update_initial_clauses(clauses, obj_num):
     clause.body = clause.body[:obj_num]
     return [clause]
 
+
 def valuation_to_attr_string(v, atoms, e, th=0.5):
     """Generate string explanations of the scene.
     """
@@ -127,6 +128,7 @@ def get_data_loader(args):
     else:
         assert 0, 'Invalid dataset type: ' + args.dataset_type
 
+
 def get_data_pos_loader(args):
     if args.dataset_type == 'kandinsky':
         return get_kandinsky_pos_loader(args)
@@ -134,6 +136,7 @@ def get_data_pos_loader(args):
         return get_clevr_pos_loader(args)
     else:
         assert 0, 'Invalid dataset type: ' + args.dataset_type
+
 
 def get_clevr_loader(args):
     dataset_train = data_clevr.CLEVRHans(
@@ -233,6 +236,7 @@ def get_kandinsky_pos_loader(args, shuffle=False):
 
     return train_loader, val_loader, test_loader
 
+
 def get_clevr_pos_loader(args):
     dataset_train = data_clevr.CLEVRHans_POSITIVE(
         args.dataset, 'train'
@@ -265,6 +269,7 @@ def get_clevr_pos_loader(args):
 
     return train_loader, val_loader, test_loader
 
+
 def get_prob(v_T, NSFR, args):
     """
     if args.dataset_type == 'kandinsky':
@@ -278,7 +283,7 @@ def get_prob(v_T, NSFR, args):
                 v=v_T, prednames=['kp1', 'kp2', 'kp3', 'kp4', 'kp5', 'kp6', 'kp7'])
     """
     return NSFR.predict(v=v_T, predname='kp')
-    #return predicted
+    # return predicted
 
 
 def get_prob_by_prednames(v_T, NSFR, prednames):
@@ -309,34 +314,37 @@ def get_nsfr_model(args, lang, clauses, atoms, bk, bk_clauses, device, train=Fal
     IM = build_infer_module(clauses, bk_clauses, atoms, lang,
                             m=args.m, infer_step=2, device=device, train=train)
     CIM = build_clause_infer_module(clauses, bk_clauses, atoms, lang,
-                            m=len(clauses), infer_step=2, device=device)
+                                    m=len(clauses), infer_step=2, device=device)
     # Neuro-Symbolic Forward Reasoner
     NSFR = NSFReasoner(perception_module=PM, facts_converter=FC,
                        infer_module=IM, clause_infer_module=CIM, atoms=atoms, bk=bk, clauses=clauses)
     return NSFR
+
 
 def __get_nsfr_model_from_nsfr(NSFR, lang, clauses, atoms, bk, bk_clauses, device):
     lang = NSFR.lang
     PM = YOLOPerceptionModule(e=NSFR.pm.e, d=11, device=device)
-    VM = YOLOValuationModule( lang=lang, device=device)
-    #elif args.dataset_type == 'clevr':
+    VM = YOLOValuationModule(lang=lang, device=device)
+    # elif args.dataset_type == 'clevr':
     #    PM = SlotAttentionPerceptionModule(e=10, d=19, device=device)
     #    VM = SlotAttentionValuationModule(lang=lang,  device=device)
-    FC = FactsConverter(lang=lang, perception_module=PM, valuation_module=VM, device=device)
+    FC = FactsConverter(lang=lang, perception_module=PM,
+                        valuation_module=VM, device=device)
     IM = build_infer_module(clauses, bk_clauses, atoms, lang,
                             m=len(clauses), infer_step=4, device=device)
     CIM = build_infer_module(clauses, bk_clauses, atoms, lang,
-                            m=len(clauses), infer_step=4, device=device)
+                             m=len(clauses), infer_step=4, device=device)
     # Neuro-Symbolic Forward Reasoner
     NSFR = NSFReasoner(perception_module=PM, facts_converter=FC,
                        infer_module=IM, clause_infer_module=CIM, atoms=atoms, bk=bk, clauses=clauses)
     return NSFR
 
 
-
 def update_nsfr_clauses(nsfr, clauses, bk_clauses, device):
-    CIM = build_clause_infer_module(clauses, bk_clauses, nsfr.atoms, nsfr.fc.lang, m=len(clauses), device=device)
-    new_nsfr = NSFReasoner(perception_module=nsfr.pm, facts_converter=nsfr.fc, infer_module=nsfr.im, clause_infer_module=CIM, atoms=nsfr.atoms, bk=nsfr.bk, clauses=clauses)
+    CIM = build_clause_infer_module(
+        clauses, bk_clauses, nsfr.atoms, nsfr.fc.lang, m=len(clauses), device=device)
+    new_nsfr = NSFReasoner(perception_module=nsfr.pm, facts_converter=nsfr.fc, infer_module=nsfr.im,
+                           clause_infer_module=CIM, atoms=nsfr.atoms, bk=nsfr.bk, clauses=clauses)
     new_nsfr._summary()
     del nsfr
     return new_nsfr

@@ -1,4 +1,9 @@
 # alphaILP: Thinking Visual Scenes as Differentiable Logic Programs
+
+<img src="./imgs/aILP_logo_pink.png" width="350">
+
+## [Documentation is here!](https://ml-research.github.io/alphailpdoc/)
+
 This is the implementation of the paper: 
 ### alphaILP: Thinking Visual Scenes as Differentiable Logic Programs
 to appear in [Machine Learning](https://www.springer.com/journal/10994), and presented at [IJCLR 2022](https://ijclr22.doc.ic.ac.uk/)

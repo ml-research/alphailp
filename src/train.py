@@ -141,7 +141,6 @@ def train_nsfr(args, NSFR, optimizer, train_loader, val_loader, test_loader, dev
         for i, sample in tqdm(enumerate(train_loader, start=0)):
             # to cuda
             imgs, target_set = map(lambda x: x.to(device), sample)
-            imgs.requires_grad = True
             # infer and predict the target probability
             V_T = NSFR(imgs)
             # NSFR.print_valuation_batch(V_T)
@@ -150,8 +149,6 @@ def train_nsfr(args, NSFR, optimizer, train_loader, val_loader, test_loader, dev
             loss_i += loss.item()
             loss.backward()
 
-            print(imgs.grad.shape)
-            print(imgs.grad)
             optimizer.step()
 
             # if i % 20 == 0:
