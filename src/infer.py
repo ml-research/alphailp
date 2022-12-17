@@ -15,7 +15,7 @@ def init_identity_weights(X, device):
 
 
 class InferModule(nn.Module):
-    def __init__(self, I, infer_step, gamma=0.01, device=None, train=False, m=1, I_bk = None):
+    def __init__(self, I, infer_step, gamma=0.01, device=None, train=False, m=1, I_bk=None):
         """
         In the constructor we instantiate two nn.Linear modules and assign them as
         member variables.
@@ -30,28 +30,27 @@ class InferModule(nn.Module):
         self.gamma = gamma
         self.device = device
         self.train_ = train
-        self.beta = 0.01 #softmax temperature
+        self.beta = 0.1  # softmax temperature
         if not train:
             self.W = init_identity_weights(I, device)
         else:
             # to learng the clause weights, initialize W as follows:
             self.W = nn.Parameter(torch.tensor(
-                #np.random.normal(size=(m, I.size(0))), requires_grad=True, dtype=torch.float32).to(device))
+                # np.random.normal(size=(m, I.size(0))), requires_grad=True, dtype=torch.float32).to(device))
                 np.random.rand(m, I.size(0)), requires_grad=True, dtype=torch.float32).to(device))
         # clause functions
         self.cs = [ClauseFunction(I[i], gamma=gamma)
                    for i in range(self.I.size(0))]
 
-
         if not I_bk is None:
             self.cs_bk = [ClauseFunction(I_bk[i], gamma=gamma)
-                       for i in range(self.I_bk.size(0))]
+                          for i in range(self.I_bk.size(0))]
             self.W_bk = init_identity_weights(I_bk, device)
 
         #print("W: ", self.W.shape)
         #print("W_bk: ", self.W_bk)
 
-        #assert m == self.C, "Invalid m and C: " + \
+        # assert m == self.C, "Invalid m and C: " + \
         #    str(m) + ' and ' + str(self.C)
 
     def get_params(self):
@@ -71,7 +70,8 @@ class InferModule(nn.Module):
         else:
             for t in range(self.infer_step):
                 #R = softor([R, self.r_bk(R)], dim=1, gamma=self.gamma)
-                R = softor([R, self.r(R), self.r_bk(R)], dim=1, gamma=self.gamma)
+                R = softor([R, self.r(R), self.r_bk(R)],
+                           dim=1, gamma=self.gamma)
         return R
 
     def r(self, x):
@@ -83,7 +83,7 @@ class InferModule(nn.Module):
 
         # taking weighted sum using m weights and stack to a tensor H
         # m * C
-        #W_star = torch.softmax(self.W * (1 / self.beta), 1)
+        # W_star = torch.softmax(self.W * (1 / self.beta), 1)
         W_star = torch.softmax(self.W, 1)
         # m * C * B * G
         W_tild = W_star.unsqueeze(
@@ -116,7 +116,6 @@ class InferModule(nn.Module):
         # m * B * G
         #H = torch.sum(W_tild * C_tild, dim=1)
 
-
         # taking soft or to compose a logic program with m clauses
         # B * G
         R = softor(H, dim=0, gamma=self.gamma)
@@ -124,7 +123,7 @@ class InferModule(nn.Module):
 
 
 class ClauseInferModule(nn.Module):
-    def __init__(self, I, infer_step, gamma=0.01, device=None, train=False, m=1, I_bk = None):
+    def __init__(self, I, infer_step, gamma=0.01, device=None, train=False, m=1, I_bk=None):
         """
         Infer module using each clause.
         The result is not amalgamated in terms of clauses.
@@ -151,7 +150,7 @@ class ClauseInferModule(nn.Module):
 
         if not self.I_bk is None:
             self.cs_bk = [ClauseFunction(I_bk[i], gamma=gamma)
-                   for i in range(self.I_bk.size(0))]
+                          for i in range(self.I_bk.size(0))]
 
         if not I_bk is None:
             self.W_bk = init_identity_weights(I_bk, device)
@@ -181,7 +180,8 @@ class ClauseInferModule(nn.Module):
                 #print("r(R): ", self.r(R).shape)
                 #print("r_bk(R): ", self.r_bk(R).shape)
                 # shape? dim?
-                R = softor([R, self.r(R), self.r_bk(R).unsqueeze(dim=0).expand(self.C, B, self.G)], dim=2, gamma=self.gamma)
+                R = softor([R, self.r(R), self.r_bk(R).unsqueeze(
+                    dim=0).expand(self.C, B, self.G)], dim=2, gamma=self.gamma)
         return R
 
     def r(self, x):
@@ -227,7 +227,7 @@ class ClauseFunction(nn.Module):
 
     def __init__(self, I_i, gamma=0.01):
         super(ClauseFunction, self).__init__()
-        #self.i = i  # clause index
+        # self.i = i  # clause index
         self.I_i = I_i  # index tensor C * S * G, S is the number of possible substituions
         self.L = I_i.size(-1)  # number of body atoms
         self.S = I_i.size(-2)  # max number of possible substitutions

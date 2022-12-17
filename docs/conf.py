@@ -49,8 +49,13 @@ todo_include_todos = True
 
 
 html_static_path = ['_static']
-html_logo = "_static/spaicer.png"
+html_logo = "_static/aILP_logo_pink.png"
 html_theme_options = {
     'logo_only': True,
     'display_version': False,
 }
+html_favicon = "_static/alphailp_favicon.png"
+
+
+html_sidebars = {'**': ['globaltoc.html',
+                        'relations.html', 'sourcelink.html', 'searchbox.html']}

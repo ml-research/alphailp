@@ -49,7 +49,7 @@ class ModeDeclaration(object):
     """
 
     def __init__(self, mode_type, recall, pred, mode_terms, ordered=True):
-        self.mode_type = mode_type # head or body
+        self.mode_type = mode_type  # head or body
         self.recall = recall
         self.pred = pred
         self.mode_terms = mode_terms
@@ -104,13 +104,19 @@ def get_mode_declarations_clevr(lang, obj_num):
     kp3(X):-in(O1,X),in(O2,X),size(O1,large),color(O1,blue),shape(O1,sphere),size(O2,small),color(O2,yellow),shape(O2,sphere)."""
 
     modeb_list = [
-        ModeDeclaration('body', obj_num, lang.get_pred_by_name('in'), [m_object, p_image]),
-        ModeDeclaration('body', 2, lang.get_pred_by_name('color'), [p_object, s_color]),
-        ModeDeclaration('body', 2, lang.get_pred_by_name('shape'), [p_object, s_shape]),
-        ModeDeclaration('body', 1, lang.get_pred_by_name('material'), [p_object, s_material]),
-        ModeDeclaration('body', 2, lang.get_pred_by_name('size'), [p_object, s_size]),
+        ModeDeclaration('body', obj_num, lang.get_pred_by_name(
+            'in'), [m_object, p_image]),
+        ModeDeclaration('body', 2, lang.get_pred_by_name(
+            'color'), [p_object, s_color]),
+        ModeDeclaration('body', 2, lang.get_pred_by_name(
+            'shape'), [p_object, s_shape]),
+        ModeDeclaration('body', 1, lang.get_pred_by_name(
+            'material'), [p_object, s_material]),
+        ModeDeclaration('body', 2, lang.get_pred_by_name(
+            'size'), [p_object, s_size]),
     ]
     return modeb_list
+
 
 def get_mode_declarations_kandinsky(lang, obj_num):
     p_image = ModeTerm('+', DataType('image'))
@@ -121,20 +127,29 @@ def get_mode_declarations_kandinsky(lang, obj_num):
 
     # modeh_1 = ModeDeclaration('head', 'kp', p_image)
 
-
     modeb_list = [
-        ModeDeclaration('body', obj_num, lang.get_pred_by_name('in'), [m_object, p_image]),
-        ModeDeclaration('body', 1, lang.get_pred_by_name('color'), [p_object, s_color]),
-        ModeDeclaration('body', 1, lang.get_pred_by_name('shape'), [p_object, s_shape]),
-        ModeDeclaration('body', 2, lang.get_pred_by_name('same_color_pair'), [p_object, p_object], ordered=False),
-        ModeDeclaration('body', 2, lang.get_pred_by_name('same_shape_pair'), [p_object, p_object], ordered=False),
-        ModeDeclaration('body', 1, lang.get_pred_by_name('diff_color_pair'), [p_object, p_object], ordered=False),
-        ModeDeclaration('body', 1, lang.get_pred_by_name('diff_shape_pair'), [p_object, p_object], ordered=False),
-        ModeDeclaration('body', 1, lang.get_pred_by_name('closeby'), [p_object, p_object], ordered=False),
-        ModeDeclaration('body', 1, lang.get_pred_by_name('online'), [p_object, p_object, p_object, p_object, p_object], ordered=False),
+        ModeDeclaration('body', obj_num, lang.get_pred_by_name(
+            'in'), [m_object, p_image]),
+        ModeDeclaration('body', 1, lang.get_pred_by_name(
+            'color'), [p_object, s_color]),
+        ModeDeclaration('body', 1, lang.get_pred_by_name(
+            'shape'), [p_object, s_shape]),
+        ModeDeclaration('body', 2, lang.get_pred_by_name(
+            'same_color_pair'), [p_object, p_object], ordered=False),
+        ModeDeclaration('body', 2, lang.get_pred_by_name(
+            'same_shape_pair'), [p_object, p_object], ordered=False),
+        ModeDeclaration('body', 1, lang.get_pred_by_name(
+            'diff_color_pair'), [p_object, p_object], ordered=False),
+        ModeDeclaration('body', 1, lang.get_pred_by_name(
+            'diff_shape_pair'), [p_object, p_object], ordered=False),
+        ModeDeclaration('body', 1, lang.get_pred_by_name(
+            'closeby'), [p_object, p_object], ordered=False),
+        ModeDeclaration('body', 1, lang.get_pred_by_name('online'), [
+                        p_object, p_object, p_object, p_object, p_object], ordered=False),
         # ModeDeclaration('body', 2, lang.get_pred_by_name('diff_shape_pair'), [p_object, p_object]),
     ]
     return modeb_list
+
 
 def get_mode_declarations(args, lang, obj_num):
     if args.dataset_type == 'kandinsky':
