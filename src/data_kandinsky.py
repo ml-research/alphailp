@@ -7,6 +7,7 @@ import numpy as np
 import random
 random.seed(10)
 
+
 class KANDINSKY(torch.utils.data.Dataset):
     """Kandinsky Patterns dataset.
     """
@@ -49,7 +50,6 @@ def load_images_and_labels(dataset='twopairs', split='train', img_size=128, smal
         n = int(len(filenames)/10)
         filenames = random.sample(filenames, n)
 
-
     for filename in filenames:
         if filename != '.DS_Store':
             image_paths.append(os.path.join(true_folder, filename))
@@ -84,7 +84,6 @@ class KANDINSKY_POSITIVE(torch.utils.data.Dataset):
         # sample 500
         # only validation is used to generate clauses
 
-
     def __getitem__(self, item):
         image = load_image_yolo(
             self.image_paths[item], img_size=self.img_size)
@@ -96,6 +95,7 @@ class KANDINSKY_POSITIVE(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.labels)
 
+
 def load_images_and_labels_positive(dataset='twopairs', split='train', img_size=128, small_data=False):
     """Load image paths and labels for kandinsky dataset.
     """
@@ -105,13 +105,14 @@ def load_images_and_labels_positive(dataset='twopairs', split='train', img_size=
     true_folder = folder + 'true/'
 
     filenames = sorted(os.listdir(true_folder))[:500]
-    #n = 500 #int(len(filenames)/10)
+    # n = 500 #int(len(filenames)/10)
     #filenames = random.sample(filenames, n)
     for filename in filenames:
         if filename != '.DS_Store':
             image_paths.append(os.path.join(true_folder, filename))
             labels.append(1)
     return image_paths, labels
+
 
 def letterbox(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True, stride=32):
     """A utilitiy function for yolov5 model to make predictions. The implementation is from the yolov5 repository.
