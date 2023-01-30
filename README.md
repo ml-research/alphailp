@@ -35,7 +35,12 @@ python src/train.py --dataset-type clevr --dataset clevr-hans2 --batch-size 1 --
 ![clevr-hans7](./imgs/clevr-hans7-predicted.png)
 
 
-
+## Pretraining Neural Predicates
+Pretraining of neural predicates can be done by, e.g., :
+```
+python src/train_np.py --dataset closeby_pretrain --no-cuda --batch-size 2 --lr 1e-1 --epochs 10
+python src/train_np.py --dataset online_pretrain --no-cuda --batch-size 2 --lr 1e-1 --epochs 10
+```
 
 # LICENSE
 See [LICENSE](./LICENSE). The [src/yolov5](./src/yolov5) folder is following [GPL3](./src/yolov5/LICENSE) license.

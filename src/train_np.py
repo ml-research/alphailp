@@ -27,16 +27,16 @@ def get_args():
     parser.add_argument("--resume", help="Path to log file to resume from")
 
     parser.add_argument(
-        "--epochs", type=int, default=1000, help="Number of epochs to train with"
+        "--epochs", type=int, default=10, help="Number of epochs to train with"
     )
     parser.add_argument(
         "--ap-log", type=int, default=10, help="Number of epochs before logging AP"
     )
     parser.add_argument(
-        "--lr", type=float, default=1e-2, help="Outer learning rate of model"
+        "--lr", type=float, default=1e-1, help="Outer learning rate of model"
     )
     parser.add_argument(
-        "--batch-size", type=int, default=1, help="Batch size to train with"
+        "--batch-size", type=int, default=2, help="Batch size to train with"
     )
     parser.add_argument(
         "--num-workers", type=int, default=4, help="Number of threads for data loader"
@@ -102,6 +102,9 @@ def run(net, predict_net, loader, optimizer, criterion, writer, args, device, tr
     be = torch.nn.BCELoss()
 
     loss_sum, acc_sum = 0, 0
+    loss_list = []
+    predicted_list = []
+    target_set_list = []
     for i, sample in tqdm(enumerate(loader, start=epoch * iters_per_epoch)):
         # to cuda
         imgs, target_set = map(lambda x: x.to(device), sample)
@@ -113,27 +116,24 @@ def run(net, predict_net, loader, optimizer, criterion, writer, args, device, tr
         x = net(imgs)
         zs = preprocess(x, args.dataset)
         predicted = predict_net(*zs)
+        predicted_list.append(predicted.detach().cpu().numpy())
+        target_set_list.append(target_set.detach().cpu().numpy())
 
         # binary cross-entropy loss computation
         loss = be(predicted, target_set)
         loss_sum += loss.item()
-        binary_output = np.where(predicted.detach().cpu().numpy() > 0.5, 1, 0)
-        acc = accuracy_score(binary_output, target_set.detach().cpu().numpy())
-        acc_sum += acc
         loss_list.append(loss.item())
         loss.backward()
         # update parameters for the step
-        if optimizer != None and epoch > 0:
+        if optimizer != None:
             optimizer.step()
 
-    if train:
-        print('predicted: ', predicted)
-        print('target_set: ', target_set)
-        print('train mean loss: ', mean_loss)
-        print('train mean acc: ', mean_acc)
-    else:
-        print('val mean loss: ', mean_loss)
-        print('val mean acc: ', mean_acc)
+    predicted = np.concatenate(predicted_list)
+    binary_output = np.where(predicted > 0.5, 1, 0)
+    target_set = np.concatenate(target_set_list)
+
+    mean_acc = accuracy_score(binary_output, target_set)
+    mean_loss = loss_sum / len(loader)
 
     return mean_loss, 0, mean_acc
 
@@ -198,7 +198,7 @@ def main():
 
     # parameters are inside of neural predicates
     params = list(predict_net.parameters())
-    print('PARAMS: ', params, len(params))
+    print('PARAMS: ', params)
     optimizer = torch.optim.Adam(params, lr=args.lr)
     criterion = torch.nn.SmoothL1Loss()
 
@@ -213,6 +213,8 @@ def main():
             # training step
             mean_loss, std_loss, mean_acc = run(
                 yolo_net, predict_net, train_loader, optimizer, criterion, writer, args, device=device, train=True, epoch=epoch, rtpt=rtpt)
+            print('training loss: ', np.round(mean_loss, 2))
+            print('training acc: ', np.round(mean_acc, 2))
             writer.add_scalar("metric/train_loss",
                               mean_loss, global_step=epoch)
             writer.add_scalar("metric/train_acc",
@@ -225,7 +227,7 @@ def main():
             # scheduler.step()
 
             # validation step
-            if epoch % 10 == 0:
+            if epoch % 5 == 0:
                 mean_loss_val, std_loss_val, mean_acc_val = run(
                     yolo_net, predict_net, val_loader, None, criterion, writer, args, device=device, train=False, epoch=epoch, rtpt=rtpt)
                 writer.add_scalar("metric/val_loss",
@@ -233,6 +235,8 @@ def main():
                 writer.add_scalar("metric/val_acc",
                                   mean_acc_val, global_step=epoch)
 
+                print('validation loss: ', np.round(mean_loss_val, 2))
+                print('validation acc: ', np.round(mean_acc_val, 2))
                 # test step
                 mean_loss_test, std_loss_test, mean_acc_test = run(
                     yolo_net, predict_net, test_loader, None, criterion, writer, args, device=device, train=False, epoch=epoch, rtpt=rtpt)
@@ -240,11 +244,13 @@ def main():
                                   mean_loss_test, global_step=epoch)
                 writer.add_scalar("metric/test_acc",
                                   mean_acc_test, global_step=epoch)
+                print('test loss: ', np.round(mean_loss_test, 2))
+                print('test acc: ', np.round(mean_acc_test, 2))
 
         # save mlp weights for neural preficate (valuation function)
         if epoch % 10 == 0:
             torch.save(predict_net.state_dict(),
-                       'weights/' + args.dataset + '.pt')
+                       'output/weights/' + args.dataset + '.pt')
 
 
 if __name__ == "__main__":
