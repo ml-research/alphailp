@@ -249,8 +249,11 @@ def main():
 
         # save mlp weights for neural preficate (valuation function)
         if epoch % 10 == 0:
+            save_dir = 'output/weights/'
+            if not os.path.exists(save_dir):
+                os.makedirs(save_dir)
             torch.save(predict_net.state_dict(),
-                       'output/weights/' + args.dataset + '.pt')
+                       save_dir + args.dataset + '.pt')
 
 
 if __name__ == "__main__":
